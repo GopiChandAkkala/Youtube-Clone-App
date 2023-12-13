@@ -75,7 +75,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        trivy image akkalagopi/youtube-app-clone:latest > scan.txt
+                        trivy --scanners vuln image akkalagopi/youtube-app-clone:latest > scan.txt
                         cat scan.txt                        
                         """
                 }
