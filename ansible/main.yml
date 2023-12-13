@@ -1,0 +1,67 @@
+---
+- name: Install Docker on Amazon Linux
+  hosts: my-ec2
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Check if Docker is installed
+      command: "docker --version"
+      ignore_errors: true
+      register: docker_installed
+
+    - name: Install Docker dependencies if not installed
+      block:
+        - name: Update package cache
+          yum:
+            name: "*"
+            state: latest
+
+        - name: Install required dependencies
+          yum:
+            name:
+              - yum-utils
+              - device-mapper-persistent-data
+              - lvm2
+            state: present
+
+        - name: Add Docker repository
+          shell: >
+            yum-config-manager --add-repo
+            https://download.docker.com/linux/centos/docker-ce.repo
+
+        - name: Install Docker
+          yum:
+            name: docker
+            state: present
+
+        - name: Start Docker service
+          service:
+            name: docker
+            state: started
+
+        - name: Add user to the docker group
+          user:
+            name: "{{ ansible_ssh_user }}"
+            groups: docker
+            append: yes
+      when: docker_installed.rc != 0
+
+- name: Pull and Run Docker Container
+  hosts: my-ec2
+  become: yes
+
+  tasks:
+    - name: Pull Docker image
+      docker_image:
+        name: akkalagopi/youtube-app-clone:latest
+        source: pull
+
+    - name: Run Docker container
+      docker_container:
+        name: youtube-app
+        image: akkalagopi/youtube-app-clone:latest
+        state: started
+        detach: yes
+        ports:
+          - "8080:3000"
