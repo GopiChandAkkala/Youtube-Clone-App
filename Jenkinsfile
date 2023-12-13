@@ -59,11 +59,11 @@ pipeline {
               //  dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             //}
         //} Taking too much time to build
-        /*stage('Trivy File Scan'){          
+        stage('Trivy File Scan'){          
             steps{
                 trivyFilescan()
             }
-        }*/
+        }
         stage("Docker Build Image") {            
             steps {
                 script {
@@ -71,16 +71,16 @@ pipeline {
                 }
             }
         }
-        stage("Trivy Image Scan") {            
+        /*stage("Trivy Image Scan") {            
             steps {
                 script {
                     sh """
-                        trivy --scanners vuln image akkalagopi/youtube-app-clone:latest > scan.txt
+                        trivy image akkalagopi/youtube-app-clone:latest > scan.txt
                         cat scan.txt                        
                         """
                 }
             }
-        }
+        }*/
         stage("Docker Image Push") {            
             steps {
                 script {
