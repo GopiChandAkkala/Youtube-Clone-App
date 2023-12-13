@@ -45,6 +45,11 @@ pipeline {
                 }
             }
         }
+        stage('Npm'){          
+            steps{
+                sh 'npm install'
+            }
+        }
 
     }
 
